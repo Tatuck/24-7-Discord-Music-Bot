@@ -1,4 +1,5 @@
 from discord.ext import commands
+import discord
 
 class SurpressOff(commands.Cog):
     def __init__(self, bot):
@@ -8,12 +9,15 @@ class SurpressOff(commands.Cog):
     async def on_voice_state_update(self, member, before, after):
         if member == self.bot.user:
             if after.channel == None:
-                channel = await self.bot.fetch_channel(self.bot.channel)
+                channel = await self.bot.fetch_channel(self.bot.channelID)
                 try:
                     await channel.connect()
-                except:
-                    pass
-            if after.suppress:
+                except Exception as e:
+                    if "Already connected to a voice channel." in str(e):
+                        pass
+                    else:
+                        raise e
+            if after.suppress and channel.type == discord.ChannelType.stage_voice:
                 me = await after.channel.guild.fetch_member(self.bot.user.id)
                 await me.edit(suppress = False)
 
