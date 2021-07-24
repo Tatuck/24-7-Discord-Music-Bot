@@ -6,14 +6,24 @@ import youtube_dl
 import requests
 import datetime
 
-YTDL_OPTS = {
-    "default_search": "ytsearch",
-    "format": "bestaudio/best",
-    "quiet": True,
-    "extract_flat": "in_playlist"
+
+ffmpeg_options = {
+    'options': '-vn'
 }
 
-FFMPEG_BEFORE_OPTS = '-reconnect 1 -reconnect_delay_max 5'
+ytdl_format_options = {
+    'format': 'bestaudio/best',
+    'outtmpl': '%(extractor)s-%(id)s-%(title)s.%(ext)s',
+    'restrictfilenames': True,
+    'noplaylist': True,
+    'nocheckcertificate': True,
+    'ignoreerrors': False,
+    'logtostderr': False,
+    'quiet': True,
+    'no_warnings': True,
+    'default_search': 'auto',
+    'source_address': '0.0.0.0' # bind to ipv4 since ipv6 addresses cause issues sometimes
+}
 
 class OnReady(commands.Cog):
     def __init__(self, bot):
@@ -36,30 +46,23 @@ class OnReady(commands.Cog):
                 print("Waiting 10 seconds...")
                 await asyncio.sleep(10)
                 continue
-            with youtube_dl.YoutubeDL(YTDL_OPTS) as ydl:
+            with youtube_dl.YoutubeDL(ytdl_format_options) as ydl:
                 info = ydl.extract_info(url, download=False)
-                streamUrl = info["formats"][0]["url"]
-            expireDate = streamUrl.split("expire/")[1].split("/")[0]
-            expireDate = datetime.datetime.fromtimestamp(int(expireDate))
-            print(f"STREAM EXPIRES: {expireDate}")
+                streamUrl = info["url"]
+
             client = channel.guild.voice_client
+
             if client == None:
-                await asyncio.sleep(300)
+                await asyncio.sleep(10)
                 break
-            source = discord.PCMVolumeTransformer(discord.FFmpegPCMAudio(streamUrl, before_options=FFMPEG_BEFORE_OPTS), 1)
+
+            source = discord.FFmpegPCMAudio(streamUrl, **ffmpeg_options)
             client.play(source)
+
             while client.is_playing():
                 await asyncio.sleep(0.1)
             break
-            #times = 0
-            #while client.is_playing():
-            #    times = times + 1
-            #    if datetime.datetime.utcnow()>=expireDate:
-            #        break
-            #    if times >= 3600:
-            #        await me.edit(suppress = False)
-            #        times = 0
-            #    await asyncio.sleep(0.1)
+
 
     @commands.Cog.listener()
     async def on_ready(self):
@@ -67,10 +70,14 @@ class OnReady(commands.Cog):
             channel = await self.bot.fetch_channel(self.bot.channelID)
             try:
                 await channel.connect()
-            except:
-                pass
-            me = await channel.guild.fetch_member(self.bot.user.id)
-            await me.edit(suppress = False)
+            except Exception as e:
+                if "Already connected to a voice channel." in str(e):
+                    pass
+                else:
+                    raise e
+            if channel.type == discord.ChannelType.stage_voice:
+                me = await channel.guild.fetch_member(self.bot.user.id)
+                await me.edit(suppress = False)
             await self._playMusic(channel)
 
 def setup(bot):
