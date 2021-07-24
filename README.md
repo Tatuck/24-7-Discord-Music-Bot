@@ -26,6 +26,29 @@ How to use:
 3. Run the bot
   `python bot.py`
   
+How to get a YouTube API Key:
+----------
+
+1. Go to the [Google Cloud Platform](https://console.cloud.google.com)
+
+3. Create a new project
+    ![Creating Project GIF](./media/creatingProject.gif)
+    
+3. Search `YouTube Data API v3` in `APIs & Services` -> `Library` and enable it
+    ![Searching and Enabling the API GIF](./media/searchingAndEnablingAPI.gif)
+    
+4. Select `Credentials`, then click `Create Credentials` and then `API key`, an API key will appear, that's what you need to paste on the config file.
+
+How to get a YouTube channel ID:
+----------
+
+1. Open a YouTube channel URL
+2. Open DevTools, you can do this by right clicking the page and selecting "Inspect", pressing the key `F12` or pressing `ctrl + shift + i` 
+3. Press `ctrl + f` and write: `https://www.youtube.com/channel/`
+4. Then the channel's ID will appear next to the link you have just searched. (You might have to press enter to go to the next result)
+5. Right click the element and select `Edit as HTML` to copy the ID
+![Find YoutTube Channel ID GIF](./media/findYouTubeChannelID.gif)
+
 Discord Server:
 ----------
 
