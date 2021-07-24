@@ -43,7 +43,7 @@ How to get a YouTube channel ID:
 ----------
 
 1. Open a YouTube channel URL
-2. Open DevTools, you can do this by right clicking the page and selecting "Inspect", pressing the key `F12` or pressing `ctrl + shift + i` 
+2. Open DevTools, you can do this by right clicking the page and selecting "Inspect", pressing the key `F12` or pressing `ctrl + shift + i`, then click any part of the HTML code
 3. Press `ctrl + f` and write: `https://www.youtube.com/channel/`
 4. Then the channel's ID will appear next to the link you have just searched. (You might have to press enter to go to the next result)
 5. Right click the element and select `Edit as HTML` to copy the ID
